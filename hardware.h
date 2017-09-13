@@ -1,4 +1,3 @@
-
 //Connections to the arduino
 //Left PWM motor controller pin out
 #define PWM_L   6 

@@ -23,7 +23,9 @@ Timer t;
 
 ////*Setup*////
 void setup() {
-  Serial.begin(115000); //Our debug Output
+  Serial.begin(38400); //bluetooth comunication
+  while(Serial.available())  Serial.read();         // empty RX buffer
+  
   beginIMU();           //Begin IMU comunication
 
   SPI.begin();
@@ -45,6 +47,8 @@ void setup() {
 
   t.every(100, ReadEncoders); // timer every 100ms to read encoders
 
+  t.every(15, ReadBluetooth); // timer every 100ms to read encoders
+
 }
 
 ////*Main Loop*////
@@ -54,12 +58,18 @@ void loop() {
   ReadIMU(); //Read the IMU, convert to degrees and filter with kalman filter here is the input for the Angle PID
   
   if( abs(AngleInput) < 30 ){ //balance if angle input is les than 30 deg
+        if(SpeedSetpoint == 0){
+        //  EncoderL.clearEncoderCount();// Clear Encoders
+         // EncoderR.clearEncoderCount();// Clear Encoders
+         // encoderLeftReadingLast = 0;
+         // encoderRightReadingLast = 0;
+        }
         
         SpeedPID.SetMode(AUTOMATIC); //turn the PID on
         AnglePID.SetMode(AUTOMATIC); //turn the PID on
         SpeedPID.Compute(); // compute speed PID
         
-        AngleSetpoint = SpeedOutput ; // The output of the speed PID is the input of the angle PID
+        AngleSetpoint = SpeedOutput; // The output of the speed PID is the input of the angle PID
         AnglePID.Compute(); // the output of the angle PID is the motor command
         
         MoveMotors(); // command motors with the output of the angle PID
@@ -74,23 +84,39 @@ void loop() {
     SpeedOutput = 0;
     EncoderL.clearEncoderCount();// Clear Encoders
     EncoderR.clearEncoderCount();// Clear Encoders
+    encoderLeftReadingLast = 0;
+    encoderRightReadingLast = 0;
   }
   
 }
 
 //Move motor is called in main loop
 void MoveMotors(){
-  
+ // if(turn >50 || turn < -50) {
+   //       turn = 0;
+  //}
   int motorPower = AngleOutput;
+  motorPowerRight = constrain(motorPower + turn, -255, 255);
+  motorPowerLeft = constrain(motorPower - turn, -255, 255);
+
   
-  if (motorPower >= 0){ // if positive move one direction
-      MotorR.Move(abs(motorPower), HIGH);
-      MotorL.Move(abs(motorPower), HIGH);
+  if (motorPowerRight >= 0){ // if positive move one direction
+      MotorR.Move(abs(motorPowerRight), HIGH);
+      //MotorL.Move(abs(motorPower - turn), HIGH);
+  }
+  else{ // if negative move oposite direction
+      MotorR.Move(abs(motorPowerRight), LOW);
+      //MotorL.Move(abs(motorPower - turn), LOW);
     
   }
-  else if(motorPower < 0){ // if negative move oposite direction
-      MotorR.Move(abs(motorPower), LOW);
-      MotorL.Move(abs(motorPower), LOW);
+
+  if (motorPowerLeft >= 0){ // if positive move one direction
+      //MotorR.Move(abs(motorPowerRight), HIGH);
+      MotorL.Move(abs(motorPowerLeft), HIGH);
+  }
+  else{ // if negative move oposite direction
+      //MotorR.Move(abs(motorPowerRight), LOW);
+      MotorL.Move(abs(motorPowerLeft), LOW);
     
   }
   
@@ -114,6 +140,13 @@ void ReadEncoders(){
     encoderRightReadingLast = encoderRightReading;
     
     SpeedInput = RightMotorSpeed + LeftMotorSpeed; // input for speed PID 
+
+    if (SpeedInput < 50) {
+      EncoderL.clearEncoderCount();// Clear Encoders
+      EncoderR.clearEncoderCount();// Clear Encoders
+      encoderLeftReadingLast = 0;
+      encoderRightReadingLast = 0;
+     }
     
     //Serial.print(LeftMotorSpeed); Serial.print("\t"); //debug encoders
     //Serial.println(RightMotorSpeed); //Serial.print("\t");

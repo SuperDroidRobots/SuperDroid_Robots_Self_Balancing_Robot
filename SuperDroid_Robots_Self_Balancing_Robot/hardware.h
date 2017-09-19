@@ -18,8 +18,8 @@ double SpeedSetpoint , SpeedInput, SpeedOutput;
 double AngleSetpoint , AngleInput, AngleOutput;
 
 // PIDs tune values
-double SpeedKp = 0.04, SpeedKi = 0.06, SpeedKd = 0 ; // outer loop
-double AngleKp = 35, AngleKi = 30, AngleKd = 0.35; // iner loop 
+double SpeedKp = 0.04, SpeedKi = 0.04, SpeedKd = 0 ; // outer loop
+double AngleKp = 35, AngleKi = 30, AngleKd = 0.25; // iner loop 
 
 /* IMU Data and Kalman variables*/
 double accY, accZ, gyroX;
@@ -34,5 +34,8 @@ double dt, roll, gyroXrate;
 long encoderRightReading = 0, encoderRightReadingLast = 0, RightMotorSpeed = 0;
 long encoderLeftReading = 0, encoderLeftReadingLast = 0, LeftMotorSpeed = 0;
 
+int drive, turn;
+int motorPowerRight;
+int motorPowerLeft;
 
 

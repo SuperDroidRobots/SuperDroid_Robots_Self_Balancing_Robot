@@ -19,7 +19,7 @@ double AngleSetpoint , AngleInput, AngleOutput;
 
 // PIDs tune values
 double SpeedKp = 0.04, SpeedKi = 0.04, SpeedKd = 0 ; // outer loop
-double AngleKp = 35, AngleKi = 30, AngleKd = 0.25; // iner loop 
+double AngleKp = 25, AngleKi = 30, AngleKd = 0.25; // iner loop 
 
 /* IMU Data and Kalman variables*/
 double accY, accZ, gyroX;

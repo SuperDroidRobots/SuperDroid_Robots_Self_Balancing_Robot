@@ -10,16 +10,16 @@
 #define InBRPin 8
 
 //Chip select for dual encoder buffer board to read encoders
-#define EncoderCSL 9
-#define EncoderCSR A0
+#define EncoderCSL 48
+#define EncoderCSR 49
 
 //PID variables setpoints, outputs, inputs
 double SpeedSetpoint , SpeedInput, SpeedOutput; 
 double AngleSetpoint , AngleInput, AngleOutput;
 
 // PIDs tune values
-double SpeedKp = 0.04, SpeedKi = 0.04, SpeedKd = 0 ; // outer loop
-double AngleKp = 25, AngleKi = 30, AngleKd = 0.25; // iner loop 
+double SpeedKp = 0.035, SpeedKi = 0.01, SpeedKd = 0 ; // outer loop
+double AngleKp = 37, AngleKi = 30, AngleKd = 0.25; // iner loop 
 
 /* IMU Data and Kalman variables*/
 double accY, accZ, gyroX;

@@ -1,12 +1,15 @@
 //Libraries used
 #include <VNH3SP30.h>
 #include "hardware.h"
-#include <Wire.h>
+#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    #include "Wire.h"
+#endif
 #include <Kalman.h> 
 #include <PID_v1.h>
 #include <SPI.h>
 #include <Encoder_Buffer.h>
 #include <Timer.h>
+#include <LiquidCrystal_I2C.h>
 
 VNH3SP30 MotorR(PWM_R, InARPin, InBRPin);
 VNH3SP30 MotorL(PWM_L, InALPin, InBLPin);
@@ -21,6 +24,8 @@ Encoder_Buffer EncoderL(EncoderCSL);
 
 Timer t;
 
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+
 ////*Setup*////
 void setup() {
   Serial.begin(38400); //bluetooth comunication
@@ -31,6 +36,16 @@ void setup() {
   SPI.begin();
   EncoderR.initEncoder(); // Init quadrature encoder
   EncoderL.initEncoder(); // Init quadrature encoder
+
+  lcd.begin();
+  lcd.backlight();
+  lcd.print("SuperDroid Robots");
+  lcd.setCursor(0,1);
+  lcd.print("Order Number: 50710");
+  lcd.setCursor(0,2);
+  lcd.print("Balancing Robot");
+  delay(2000);
+  lcd.clear();
   
   MotorR.Stop(); //Stop motor
   MotorL.Stop(); //Stop motor
@@ -46,8 +61,8 @@ void setup() {
   SpeedSetpoint = 0;// setpoint for speed PID
 
   t.every(100, ReadEncoders); // timer every 100ms to read encoders
-
-  t.every(15, ReadBluetooth); // timer every 100ms to read encoders
+  LCDBegin();
+  t.every(200, UpdateLCD); // timer every 1s to read encoders
 
 }
 
@@ -87,7 +102,7 @@ void loop() {
     encoderLeftReadingLast = 0;
     encoderRightReadingLast = 0;
   }
-  
+
 }
 
 //Move motor is called in main loop
@@ -96,8 +111,8 @@ void MoveMotors(){
    //       turn = 0;
   //}
   int motorPower = AngleOutput;
-  motorPowerRight = constrain(motorPower + turn, -255, 255);
-  motorPowerLeft = constrain(motorPower - turn, -255, 255);
+  motorPowerRight = constrain(motorPower*1.05, -255, 255);
+  motorPowerLeft = constrain(motorPower, -255, 255);
 
   
   if (motorPowerRight >= 0){ // if positive move one direction
@@ -120,7 +135,7 @@ void MoveMotors(){
     
   }
   
-  /*Serial.print(SpeedSetpoint); Serial.print("\t");
+ /* Serial.print(AngleInput); Serial.print("\t");
   Serial.print(SpeedInput); Serial.print("\t");
   Serial.print(SpeedOutput); Serial.print("\t");
   Serial.println(AngleOutput); */

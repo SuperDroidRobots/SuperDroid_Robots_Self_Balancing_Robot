@@ -1,9 +1,13 @@
 // the i2c.ino is used here to read the imu data
 
 void beginIMU(){
-
- Wire.begin();
-  Wire.setClock(400000UL); // Set I2C frequency to 400kHz
+    // join I2C bus (I2Cdev library doesn't do this automatically)
+    #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+        Wire.begin();
+    #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+        Fastwire::setup(400, true);
+    #endif
+ // Wire.setClock(400000UL); // Set I2C frequency to 400kHz
  
   i2cData[0] = 7; // Set the sample rate to 1000Hz - 8kHz/(7+1) = 1000Hz
   i2cData[1] = 0x00; // Disable FSYNC and set 260 Hz Acc filtering, 256 Hz Gyro filtering, 8 KHz sampling

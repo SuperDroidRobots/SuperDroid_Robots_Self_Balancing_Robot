@@ -28,7 +28,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 ////*Setup*////
 void setup() {
-  Serial.begin(38400); //bluetooth comunication
+  Serial.begin(38400); 
   while(Serial.available())  Serial.read();         // empty RX buffer
   
   beginIMU();           //Begin IMU comunication
@@ -37,6 +37,7 @@ void setup() {
   EncoderR.initEncoder(); // Init quadrature encoder
   EncoderL.initEncoder(); // Init quadrature encoder
 
+/*****LCD Initial message*****/
   lcd.begin();
   lcd.backlight();
   lcd.print("SuperDroid Robots");
@@ -62,7 +63,7 @@ void setup() {
 
   t.every(100, ReadEncoders); // timer every 100ms to read encoders
   LCDBegin();
-  t.every(200, UpdateLCD); // timer every 1s to read encoders
+  t.every(200, UpdateLCD); //Timer every 200ms to update lcd
 
 }
 
@@ -111,7 +112,7 @@ void MoveMotors(){
    //       turn = 0;
   //}
   int motorPower = AngleOutput;
-  motorPowerRight = constrain(motorPower*1.05, -255, 255);
+  motorPowerRight = constrain(motorPower*1.08, -255, 255);
   motorPowerLeft = constrain(motorPower, -255, 255);
 
   
